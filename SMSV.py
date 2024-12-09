@@ -47,6 +47,11 @@ def observation_likelihood(y, μ, x):
 
     return likelihood
 
+def enforce_bounds(array, lower_bound=-100, upper_bound=100):
+
+    if lower_bound > upper_bound:
+        raise ValueError("Lower bound cannot be greater than upper bound.")
+    return np.clip(array, lower_bound, upper_bound)
 
 def SMSV(observation, L = 1_000_000, δ = 0.98):
     """Constant Parameters"""
@@ -113,11 +118,11 @@ def SMSV(observation, L = 1_000_000, δ = 0.98):
     for t in tqdm(range(1, T, 1)):
         # SOSS update
         p_x̄[t] = SOSS_update(α_shrink_factor, x̄[t-1])
-        p_ϕ_x[t] = SOSS_update(α_shrink_factor, ϕ_x[t-1])
-        p_σ_x[t] = SOSS_update(α_shrink_factor, σ_x[t-1])
         p_μ̄[t] = SOSS_update(α_shrink_factor, μ̄[t-1])
-        p_σ_μ[t] = SOSS_update(α_shrink_factor, σ_μ[t-1])
-        p_ϕ_μ[t] = SOSS_update(α_shrink_factor, ϕ_μ[t-1])
+        p_ϕ_x[t] = enforce_bounds(SOSS_update(α_shrink_factor, ϕ_x[t-1]), -1, 1)
+        p_σ_x[t] = enforce_bounds(SOSS_update(α_shrink_factor, σ_x[t-1]), 0, 100)
+        p_σ_μ[t] = enforce_bounds(SOSS_update(α_shrink_factor, σ_μ[t-1]), 0, 100)
+        p_ϕ_μ[t] = enforce_bounds(SOSS_update(α_shrink_factor, ϕ_μ[t-1]), -1, 1)
 
         # generate system noise and calculate particles for x
         ξ[t] = N(0, 1, L)

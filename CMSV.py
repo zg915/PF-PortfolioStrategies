@@ -153,7 +153,7 @@ def CMSV(observation, L = 1_000_000, δ = 0.98):
     
     """AD 1"""
     # define the log likelihood at time t by l(yt) ≡ log p(yt|Zt) which is approximately calculated with taking log of the right hand side of 
-    log_likelihood = np.log(np.sum(α, axis=1))
+    log_likelihood = np.log(np.mean(α, axis=1))
 
     # threshold is set to be about the 5 percentile of {l(yt )}t=6,...,47, which corresponds to the second lowest value in {l(yt )}t=6,...,47.
     threshold = np.sort(log_likelihood[6:48])[1]
